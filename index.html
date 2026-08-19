@@ -33,7 +33,9 @@
   /* nav */
   header{position:sticky;top:0;z-index:40;transition:all .3s}
   header.scrolled{background:rgba(251,246,238,.95);backdrop-filter:blur(8px);box-shadow:0 4px 14px -8px rgba(0,0,0,.25)}
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
+  /* padding-block only — a `padding:1rem 0` shorthand here would override .wrap's
+     horizontal padding and push the logo and cart button flush to the screen edge */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding-top:1rem;padding-bottom:1rem}
   .logo{display:flex;align-items:center;gap:.5rem}
   .logo-badge{display:grid;place-items:center;height:2.75rem;width:2.75rem;border-radius:50%;
     background:linear-gradient(135deg,var(--red700),var(--amber600));font-size:1.25rem;box-shadow:0 4px 10px -4px rgba(0,0,0,.4)}
@@ -145,6 +147,32 @@
     font-variant-numeric:tabular-nums}
   .card-qty .n.bump{animation:wa-bump .35s ease}
   .cart-badge.bump{animation:wa-bump .35s ease}
+
+  /* ---- phone tuning: comfortable tap targets, tighter vertical rhythm ---- */
+  /* Card layout is untouched — one card per row, price and action side by side. */
+  @media(max-width:639px){
+    /* 5rem top-and-bottom on every section eats most of a phone screen */
+    .sec{padding:3.5rem 1rem}
+    /* keep the tagline on one line so the sticky header stays short */
+    .logo-name{font-size:1.15rem}
+    .logo-sub{font-size:.5rem;letter-spacing:.11em;white-space:nowrap}
+    .usp-grid{gap:1.25rem}
+
+    /* everything tappable gets to ~44px, the minimum comfortable touch size */
+    .cart-icon,.burger{height:2.75rem;width:2.75rem}
+    .filters button{min-height:2.75rem;padding:.5rem 1.1rem}
+    .hero-cta .btn{min-height:2.75rem}
+    .contact-form .send{min-height:2.75rem}
+    .cart-close{height:2.75rem;width:2.75rem}
+    .qtyrow button{height:2rem;width:2rem}
+    /* both action states stay 44px, so swapping still never shifts the card */
+    .card-act{min-height:2.75rem}
+    .add-btn{min-height:2.75rem;padding:.5rem 1.25rem}
+    .card-qty{height:2.75rem}
+    .card-qty button{height:2.25rem;width:2.25rem}
+    /* footer links were 16px tall — too small to hit reliably */
+    footer ul button{padding:.4rem 0}
+  }
 
   /* story */
   .story{background:var(--stone900);color:var(--amber50)}
