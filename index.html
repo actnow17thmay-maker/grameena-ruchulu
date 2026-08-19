@@ -357,7 +357,7 @@
         <p class="intro">Bulk orders, gifting or just a craving? We'd love to hear from you. Drop your details and our team will reach out.</p>
         <div class="contact-lines">
           <p><span class="ico">📍</span> Hyderabad, Telangana, India</p>
-          <p><span class="ico">📞</span> +91 90123 45678</p>
+          <p><span class="ico">📞</span> +91 70320 11883</p>
           <p><span class="ico">✉️</span> contact@grameenaruchulu.in</p>
           <div class="socials"><span>📘</span><span>📸</span><span>▶️</span><span>💬</span></div>
         </div>
@@ -384,7 +384,7 @@
       </div>
       <div>
         <h4>Contact</h4>
-        <ul><li>Hyderabad, Telangana</li><li>+91 90123 45678</li><li>contact@grameenaruchulu.in</li></ul>
+        <ul><li>Hyderabad, Telangana</li><li>+91 70320 11883</li><li>contact@grameenaruchulu.in</li></ul>
       </div>
     </div>
     <div class="foot-bar" id="copyright"></div>
@@ -417,6 +417,11 @@
     ["🛡️","Hygienically Packed","Vacuum-sealed in food-grade jars so your pickle travels fresh, anywhere in the world."],
     ["💬","Loved by Thousands","From Hyderabad to Houston, families trust us for that one taste they call home."]
   ];
+
+  // ---- config ----
+  // WhatsApp order destination: country code + number, digits only (no +, spaces or dashes).
+  // Must be a number with WhatsApp active, or wa.me shows "phone number shared via url is invalid".
+  const WHATSAPP_NUMBER = "917032011883";
 
   let cart = [];        // {id, qty}
   let filter = "All";
@@ -572,7 +577,8 @@
       (total>=999 ? "\n(Free shipping unlocked 🎉)" : "") +
       "\n\nPlease confirm availability and delivery. Thank you!";
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
+    const w = window.open(url, "_blank");
+    if(!w) location.href = url;   // popup blocked (common inside in-app browsers)
   }
 
   // ---- misc ----
