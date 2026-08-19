@@ -135,6 +135,16 @@
   .price small{font-size:.75rem;font-weight:400;color:var(--stone400)}
   .add-btn{border-radius:9999px;background:var(--red800);padding:.5rem 1rem;font-size:.875rem;font-weight:600;color:var(--amber50);transition:background .2s}
   .add-btn:hover{background:var(--red900)}
+  /* on-card quantity stepper (replaces "Add +" once the item is in the basket) */
+  .card-act{display:flex;justify-content:flex-end;align-items:center;min-height:2.25rem}
+  .card-qty{display:flex;align-items:center;gap:.125rem;border-radius:9999px;background:var(--red800);padding:.25rem}
+  .card-qty button{display:grid;place-items:center;height:1.75rem;width:1.75rem;border-radius:50%;
+    color:var(--amber50);font-size:1.05rem;line-height:1;transition:background .2s}
+  .card-qty button:hover{background:var(--red900)}
+  .card-qty .n{min-width:1.75rem;text-align:center;font-size:.875rem;font-weight:700;color:var(--amber50);
+    font-variant-numeric:tabular-nums}
+  .card-qty .n.bump{animation:wa-bump .35s ease}
+  .cart-badge.bump{animation:wa-bump .35s ease}
 
   /* story */
   .story{background:var(--stone900);color:var(--amber50)}
@@ -452,32 +462,59 @@
           <p class="card-desc">${p.desc}</p>
           <div class="card-foot">
             <span class="price">₹${p.price}<small> / 250g</small></span>
-            <button class="add-btn" onclick="addToCart('${p.id}')">Add +</button>
+            <div class="card-act" data-pid="${p.id}">${cardAction(p.id)}</div>
           </div>
         </div>
       </div>`).join("");
   }
 
   // ---- cart ----
+  // Card action slot: "Add +" until the item is in the basket, then a qty stepper.
+  function cardAction(id){
+    const it = cart.find(i=>i.id===id);
+    if(!it) return `<button class="add-btn" onclick="addToCart('${id}')">Add +</button>`;
+    return `<div class="card-qty">
+        <button onclick="updateQty('${id}',-1)" aria-label="Remove one">−</button>
+        <span class="n" aria-live="polite">${it.qty}</span>
+        <button onclick="updateQty('${id}',1)" aria-label="Add one">+</button>
+      </div>`;
+  }
+  // Keep visible cards in sync with the cart. Only replaces markup when a card crosses
+  // the add<->stepper boundary, so the button under the cursor survives repeat clicks.
+  function syncCards(bumpId){
+    document.querySelectorAll(".card-act").forEach(el=>{
+      const id = el.dataset.pid;
+      const it = cart.find(i=>i.id===id);
+      const n  = el.querySelector(".n");
+      if(it && n) n.textContent = it.qty; else el.innerHTML = cardAction(id);
+      if(id===bumpId){
+        const b = el.querySelector(".n");
+        if(b){ b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
+      }
+    });
+  }
   function addToCart(id){
     const found = cart.find(i=>i.id===id);
     if(found) found.qty++; else cart.push({id, qty:1});
-    renderCart(); openCart();
+    renderCart(id);
   }
   function updateQty(id,delta){
     const it = cart.find(i=>i.id===id);
     if(!it) return;
     it.qty += delta;
     cart = cart.filter(i=>i.qty>0);
-    renderCart();
+    renderCart(id);
   }
   function openCart(){ document.getElementById("cartScreen").classList.add("open"); }
   function closeCart(){ document.getElementById("cartScreen").classList.remove("open"); }
 
-  function renderCart(){
+  function renderCart(bumpId){
     const count = cart.reduce((s,i)=>s+i.qty,0);
+    syncCards(bumpId);
+
     const badge = document.getElementById("cartBadge");
     badge.textContent = count; badge.style.display = count>0 ? "grid" : "none";
+    if(bumpId && count>0){ badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump"); }
 
     // floating whatsapp button count
     const waCount = document.getElementById("waCount");
